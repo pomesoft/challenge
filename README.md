@@ -16,7 +16,7 @@ reporte de detectores prioritarios.
 flowchart TB
 
     %% ===============================
-    %% Presentation Layer
+    %% Capa de Presentación
     %% ===============================
     subgraph P["Presentation Layer"]
         U["Usuario<br/>Ecosystem JSON"]
@@ -25,14 +25,14 @@ flowchart TB
     end
 
     %% ===============================
-    %% Orchestration Layer
+    %% Orquestación
     %% ===============================
     subgraph O["Orchestration Layer"]
         LG["LangGraph Orchestrator<br/>StateGraph + Checkpoints"]
     end
 
     %% ===============================
-    %% Intelligence Layer
+    %% Agentes
     %% ===============================
     subgraph I["Intelligence Layer (Multi-Agent)"]
         direction LR
@@ -47,7 +47,7 @@ flowchart TB
     end
 
     %% ===============================
-    %% Knowledge Layer
+    %% Base de conocimeinto / Contexto
     %% ===============================
     subgraph K["Knowledge Layer"]
         PDF["DBIR 2025 PDF"]
@@ -57,7 +57,7 @@ flowchart TB
     end
 
     %% ===============================
-    %% External Tools
+    %% HErramientas Externas
     %% ===============================
     subgraph T["External Tools"]
         MCP["MCP Server<br/>MITRE ATT&CK"]
@@ -65,7 +65,7 @@ flowchart TB
     end
 
     %% ===============================
-    %% Observability
+    %% Observabilidad
     %% ===============================
     subgraph OBS["Observability & Storage"]
         LOGS["runs/<session_id><br/>trace.json<br/>agent_outputs"]
