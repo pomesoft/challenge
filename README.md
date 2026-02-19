@@ -104,6 +104,12 @@ pip install -r requirements.txt
 
 ### Ejecución
 
+Cargar base de datos vectorial ChromaDB
+```bash
+python vector_stores.py
+```
+
+Interfaz grafica con Streamlit
 ```bash
 cd src
 streamlit run app_streamlit.py

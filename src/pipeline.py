@@ -508,40 +508,6 @@ def load_ecosystem(path: Path) -> EcosystemInput:
     data = json.loads(path.read_text(encoding="utf-8"))
     return EcosystemInput.model_validate(data)
 
-
-
-# def main():
-#     ap = argparse.ArgumentParser()
-#     ap.add_argument("--ecosystem", required=True, help="Path to ecosystem JSON")
-#     ap.add_argument("--out", default="runs", help="Output runs directory")
-#     args = ap.parse_args()
-
-#     out_dir = Path(args.out)
-#     out_dir.mkdir(parents=True, exist_ok=True)
-
-#     session_id = str(uuid.uuid4())
-#     eco = load_ecosystem(Path(args.ecosystem))
-
-#     state = GraphState(session_id=session_id, ecosystem=eco)
-#     graph = build_graph()
-
-#     # invoke with a thread_id so checkpointer can track a thread
-#     result: GraphState = graph.invoke(state, config={"configurable": {"thread_id": session_id}})
-
-#     run_dir = ensure_run_dir(out_dir, session_id)
-#     write_json(run_dir, "00_input.json", result.ecosystem.model_dump())
-#     write_json(run_dir, "10_analyzer.json", result.analyzer.model_dump() if result.analyzer else None)
-#     write_json(run_dir, "20_classifier.json", result.classifier.model_dump() if result.classifier else None)
-#     write_text(run_dir, "30_report.md", result.reporter.report_md if result.reporter else "")
-#     write_json(run_dir, "trace.json", result.events)
-
-#     print(f"✅ Done. Session: {session_id}")
-#     print(f"📁 Outputs: {run_dir}")
-
-
-# if __name__ == "__main__":
-#     main()
-
 from pathlib import Path
 import json
 
