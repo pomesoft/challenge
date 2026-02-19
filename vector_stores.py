@@ -3,7 +3,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from config import *
+
+PDF_LOADER_DOC = "C:\\WorkLabs\\Challenge\\assets\\2025-dbir-data-breach-investigations-report.pdf"
+CHROMA_DB_PATH = "C:\\WorkLabs\\Challenge\\chroma_db"
 
 loader = PyPDFLoader(PDF_LOADER_DOC)
 documentos = loader.load()
