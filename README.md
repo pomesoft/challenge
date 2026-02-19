@@ -11,78 +11,56 @@ ataque/riesgos, comparativa con el contexto del ecosistema a evaluar, y generaci
 reporte de detectores prioritarios.
 
 ## Arquiectura propuesta
+
+## 🏗 Arquitectura Propuesta
+
+```mermaid
 flowchart LR
+
   %% ===========
   %% Client / UI
   %% ===========
-  U[Usuario\n(Ecosystem JSON + Preguntas)] -->|Chat / Form| ST[Streamlit UI\napp.py]
+  U[Usuario\n(Ecosystem JSON + Preguntas)] --> ST[Streamlit UI\napp.py]
 
   %% ==================
   %% Orchestrator Layer
   %% ==================
-  ST -->|run_pipeline(ecosystem)| LG[LangGraph Orchestrator\n(StateGraph + checkpoints)]
+  ST --> LG[LangGraph Orchestrator\n(StateGraph + checkpoints)]
 
   %% ===========
-  %% Knowledge/RAG
+  %% Knowledge / RAG
   %% ===========
-  subgraph RAG["RAG DBIR 2025 (Base de Conocimiento)"]
-    PDF[DBIR 2025 PDF\nassets/2025-dbir-...pdf] --> LD[PyPDFLoader + Splitter\n(chunking)]
-    LD --> VS[(Chroma Vector Store\npersist_directory)]
-    VS --> RET[Retriever\nMMR + MultiQuery\n(+ Hybrid optional)]
+  subgraph RAG["RAG DBIR 2025"]
+    PDF[DBIR 2025 PDF] --> LD[PyPDFLoader + Splitter]
+    LD --> VS[(Chroma Vector Store)]
+    VS --> RET[Retriever\nMMR + MultiQuery]
   end
 
   %% ===================
-  %% Multi-Agent Workflow
+  %% Multi-Agent System
   %% ===================
-  subgraph AGENTS["Multi-Agent System (3 agentes)"]
-    A1[Agente 1: Analyzer\nGenera hasta 5 detectores\n+ riesgo H/M/L\n+ evidencia DBIR]
-    V1{Validator / Checkpoint\nSchema + reglas}
-    A2[Agente 2: Classifier\nMapea detectores a\nMITRE ATT&CK techniques\n+ impacto + prioridad]
-    V2{Validator / Checkpoint\nConfianza / tool errors}
-    A3[Agente 3: Reporter\nReporte final Markdown\n+ accionables por equipo]
-    V3{Validator / Checkpoint\nCompletitud / calidad}
+  subgraph AGENTS["Multi-Agent Workflow"]
+    A1[Agente 1: Analyzer\nDetectores + riesgo]
+    V1{Validator}
+    A2[Agente 2: Classifier\nMITRE ATT&CK]
+    V2{Validator}
+    A3[Agente 3: Reporter\nReporte Markdown]
+    V3{Validator}
   end
 
-  %% ====================
-  %% LLM + Tools Backends
-  %% ====================
-  LLM[(OpenAI Responses API\nvia ChatOpenAI use_responses_api)]
-  MCP[(MCP Server\nMITRE ATT&CK Tools)]
-
-  %% ===========
-  %% Data Flow
-  %% ===========
   LG --> A1
-  A1 -->|consulta DBIR| RET
+  A1 --> RET
   RET --> A1
   A1 --> V1
   V1 -->|OK| A2
   V1 -->|Repair| A1
 
-  A2 -->|tool calls| MCP
-  MCP --> A2
+  A2 --> MCP[(MCP MITRE Server)]
   A2 --> V2
   V2 -->|OK| A3
-  V2 -->|Repair / retry| A2
+  V2 -->|Repair| A2
 
   A3 --> V3
-  V3 -->|OK| OUT[Outputs\nreport.md + json]
-  V3 -->|Repair| A3
+  V3 -->|OK| OUT[report.md + json]
 
-  %% LLM usage
-  A1 --> LLM
-  A2 --> LLM
-  A3 --> LLM
-
-  %% =====================
-  %% Observability / Storage
-  %% =====================
-  subgraph OBS["Trazabilidad / Observabilidad"]
-    LOGS[(Central Store\nruns/<session_id>/\ntrace.json + I/O por agente)]
-  end
-
-  LG -->|events + I/O| LOGS
-  OUT --> LOGS
-  ST -->|mostrar resultados| OUT
-
-
+```
