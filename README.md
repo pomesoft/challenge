@@ -93,3 +93,18 @@ La arquitectura está diseñada en capas desacopladas: Presentation, Orchestrati
 LangGraph controla el flujo con checkpoints y validaciones no lineales.
 El RAG provee grounding en DBIR 2025 y el MCP conecta dinámicamente con MITRE ATT&CK sin hardcodear técnicas.
 Toda ejecución es trazable por session_id para reproducibilidad.
+
+
+### Instalación
+
+```bash
+pip install -r requirements.txt
+
+```
+
+### Ejecución
+
+```bash
+cd src
+streamlit run app_streamlit.py
+```
