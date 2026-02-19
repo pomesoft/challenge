@@ -10,47 +10,86 @@ específicos que implementen un pipeline secuencial de análisis de vectores de
 ataque/riesgos, comparativa con el contexto del ecosistema a evaluar, y generación de un
 reporte de detectores prioritarios.
 
-## 🏗 Arquitectura Propuesta
+## 🏗 Enterprise Architecture Overview
 
 ```mermaid
-flowchart LR
+flowchart TB
 
-    U["Usuario<br/>Ecosystem JSON y preguntas"]
-    ST["Streamlit UI<br/>app.py"]
-    LG["LangGraph Orchestrator<br/>StateGraph + checkpoints"]
+    %% ===============================
+    %% Presentation Layer
+    %% ===============================
+    subgraph P["Presentation Layer"]
+        U["Usuario<br/>Ecosystem JSON"]
+        UI["Streamlit UI<br/>app.py"]
+        U --> UI
+    end
 
-    subgraph RAG["RAG DBIR 2025"]
+    %% ===============================
+    %% Orchestration Layer
+    %% ===============================
+    subgraph O["Orchestration Layer"]
+        LG["LangGraph Orchestrator<br/>StateGraph + Checkpoints"]
+    end
+
+    %% ===============================
+    %% Intelligence Layer
+    %% ===============================
+    subgraph I["Intelligence Layer (Multi-Agent)"]
+        direction LR
+        A1["Analyzer<br/>Detectores + Riesgo"]
+        V1{"Validator"}
+        A2["Classifier<br/>MITRE Mapping"]
+        V2{"Validator"}
+        A3["Reporter<br/>Markdown Report"]
+        V3{"Validator"}
+
+        A1 --> V1 --> A2 --> V2 --> A3 --> V3
+    end
+
+    %% ===============================
+    %% Knowledge Layer
+    %% ===============================
+    subgraph K["Knowledge Layer"]
         PDF["DBIR 2025 PDF"]
-        LD["Loader + Splitter"]
         VS["Chroma Vector Store"]
-        RET["Retriever MMR MultiQuery"]
-        PDF --> LD --> VS --> RET
+        RET["Retriever<br/>MMR + MultiQuery"]
+        PDF --> VS --> RET
     end
 
-    subgraph AGENTS["Multi-Agent Workflow"]
-        A1["Agente 1 Analyzer<br/>Detectores y riesgo"]
-        V1{"Validator 1"}
-        A2["Agente 2 Classifier<br/>MITRE ATTACK mapping"]
-        V2{"Validator 2"}
-        A3["Agente 3 Reporter<br/>Reporte Markdown"]
-        V3{"Validator 3"}
+    %% ===============================
+    %% External Tools
+    %% ===============================
+    subgraph T["External Tools"]
+        MCP["MCP Server<br/>MITRE ATT&CK"]
+        LLM["OpenAI Responses API"]
     end
 
-    MCP["MCP Server MITRE"]
-    OUT["Outputs<br/>report.md y json"]
+    %% ===============================
+    %% Observability
+    %% ===============================
+    subgraph OBS["Observability & Storage"]
+        LOGS["runs/<session_id><br/>trace.json<br/>agent_outputs"]
+    end
 
-    U --> ST
-    ST --> LG
+    %% ===============================
+    %% Connections
+    %% ===============================
+
+    UI --> LG
     LG --> A1
-    A1 --> RET
     RET --> A1
-    A1 --> V1
-    V1 -->|OK| A2
-    V1 -->|Repair| A1
     A2 --> MCP
-    A2 --> V2
-    V2 -->|OK| A3
-    V2 -->|Repair| A2
-    A3 --> V3
-    V3 -->|OK| OUT
+
+    A1 --> LLM
+    A2 --> LLM
+    A3 --> LLM
+
+    V3 --> LOGS
+    LG --> LOGS
 ```
+
+
+La arquitectura está diseñada en capas desacopladas: Presentation, Orchestration, Intelligence, Knowledge y Tools.
+LangGraph controla el flujo con checkpoints y validaciones no lineales.
+El RAG provee grounding en DBIR 2025 y el MCP conecta dinámicamente con MITRE ATT&CK sin hardcodear técnicas.
+Toda ejecución es trazable por session_id para reproducibilidad.
