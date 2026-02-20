@@ -27,7 +27,7 @@ model = st.sidebar.text_input(
 
 mitre_url = st.sidebar.text_input(
     "MITRE MCP URL",
-    value="http://localhost:3333"
+    value="http://localhost:8000/mcp"
 )
 
     

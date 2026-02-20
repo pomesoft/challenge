@@ -238,7 +238,9 @@ def analyzer_node(state: GraphState) -> GraphState:
     )
 
     try:
+        print(f".analyzer_node: Llamando a LLM. Ecosystem input: {user.content} ")        
         raw = llm.invoke([sys, user])
+        print(f".analyzer_node: LLM invocado. Raw output: {raw.content} ")
         # Compatible con Responses API
         if isinstance(raw.content, list):
             text_output = "".join(
@@ -303,7 +305,9 @@ def classifier_node(state: GraphState) -> GraphState:
     print(f"Classifier user message preparado. {user.content} ")
 
     try:
+        print(f".classifier_node: Llamando a LLM con MCP bind. URL MCP: {mitre_url} ")
         raw = llm.invoke([sys, user])
+        print(f".classifier_node: LLM invocation completa. Raw output: {raw.content} ")
         # Compatible con Responses API
         if isinstance(raw.content, list):
             text_output = "".join(
@@ -317,8 +321,8 @@ def classifier_node(state: GraphState) -> GraphState:
         parsed = parser.parse(text_output)
         # Si el modelo devolvió solo lista → envolverla
         if isinstance(parsed, list):
-            parsed = {"detectors": parsed}
-        out = AnalyzerOutput.model_validate(parsed)
+            parsed = {"mappings": parsed}
+        out = ClassifierOutput.model_validate(parsed)
         state.classifier = out
         
         state.last_error = None
@@ -358,7 +362,9 @@ def reporter_node(state: GraphState) -> GraphState:
     )
 
     try:
+        print(f".reporter_node: Llamando a LLM. Ecosystem input: {user.content} ")        
         raw = llm.invoke([sys, user])
+        print(f".reporter_node: LLM invocado. Raw output: {raw.content} ")
         # Compatible con Responses API
         if isinstance(raw.content, list):
             text_output = "".join(
@@ -373,9 +379,9 @@ def reporter_node(state: GraphState) -> GraphState:
         # Si el modelo devolvió solo lista → envolverla
         if isinstance(parsed, list):
             parsed = {"detectors": parsed}
-        out = AnalyzerOutput.model_validate(parsed)
-        
+        out = ReporterOutput.model_validate(parsed)
         state.reporter = out
+        
         state.last_error = None
         return log_event(state, "reporter", {"ok": True, "chars": len(out.report_md)})
     except Exception as e:
